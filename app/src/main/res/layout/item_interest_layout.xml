@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/card"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="15dp"
+    android:layout_margin="15dp"
+    app:cardBackgroundColor="@color/bg_light_grey">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Artist"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:gravity="center"/>
+
+</com.google.android.material.card.MaterialCardView>

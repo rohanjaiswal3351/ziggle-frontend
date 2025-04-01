@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "82209493480",
+    "project_id": "dating-app-b84a6",
+    "storage_bucket": "dating-app-b84a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82209493480:android:31e8b33a3d77104745545d",
+        "android_client_info": {
+          "package_name": "com.rohan.datingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82209493480-t2kdegamp1g4rir2eb6i4ed1q4vgbh1a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPUvGIrIVP-S5aKFwlgUYHv-CSCrsmQn0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82209493480-t2kdegamp1g4rir2eb6i4ed1q4vgbh1a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

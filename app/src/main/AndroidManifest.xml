@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.rohan.datingapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_icon_3"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_icon_3_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.DatingApp">
+        <activity
+            android:name=".activity.BuyPremiumActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ShowImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.UpdateInterestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ShowUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.UpdateBasicsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.MessageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SplashScreenActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".auth.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".notification.MyFirebaseMessagingService"
+            android:exported="false"
+            android:permission="com.google.android.c2dm.permission.Send">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.Reciever" />
+            </intent-filter>
+        </service>
+
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+<!--            android:value="ca-app-pub-2535385936024567~8394137982" />-->
+    </application>
+
+</manifest>

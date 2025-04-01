@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.UpdateBasicsActivity"
+    android:background="@color/layout_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp">
+
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/ic_baseline_arrow_back_ios_24" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/education"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/mortarboard"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's your education?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Sixth form"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Technical college"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu3"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="I'm an undergrad"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu4"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Undergraduate degree"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu5"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="I'm a postgrad"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/edu6"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Postgraduate degree"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/toilet"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick which best describes you"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/gen1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Woman"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/gen2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Man"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/gen3"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Nonbinary"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Country"
+                android:fontFamily="sans-serif-condensed"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center_horizontal"/>
+
+            <com.rilixtech.widget.countrycodepicker.CountryCodePicker
+                android:id="@+id/ccp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:ccp_defaultNameCode="US"
+                app:ccp_showFullName="true"
+                app:ccp_hideNameCode="true"
+                app:ccp_hidePhoneCode="true"
+                android:background="@drawable/edittext_border"
+                android:backgroundTint="@color/colorPrimary"
+                android:gravity="center"
+                app:ccp_backgroundColor="@color/white"
+                android:layout_marginTop="20dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:text="Save"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/scale"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's your height?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <EditText
+                android:id="@+id/enterHeight"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:hint="height in cm"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveHeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Save"
+                android:fontFamily="sans-serif-condensed"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/exercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/gym"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Do you work out?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/ex1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Active"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/ex2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Sometimes"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/ex3"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Almost never"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/star"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/sign"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's your star sign?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Aries"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Taurus"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s3"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Gemini"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s4"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Cancer"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s5"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Leo"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s6"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Virgo"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s7"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Libra"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s8"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Scorpio"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s9"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Sagittarius"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s10"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Capricorn"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s11"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Aquarius"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/s12"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edittext_border"
+                android:padding="8dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Pisces"
+                android:fontFamily="sans-serif-condensed"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/person"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's your name?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="20dp"
+                app:boxCornerRadiusBottomEnd="20dp"
+                app:boxCornerRadiusBottomStart="20dp"
+                app:boxCornerRadiusTopEnd="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="10dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/nameTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:inputType="textPersonName"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="50dp"
+                app:cornerRadius="20dp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/age"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/person"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What's your age?"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:gravity="center"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="20dp"
+                app:boxCornerRadiusBottomEnd="20dp"
+                app:boxCornerRadiusBottomStart="20dp"
+                app:boxCornerRadiusTopEnd="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="10dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ageTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:inputType="number"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveAge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="50dp"
+                app:cornerRadius="20dp"/>
+
+
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

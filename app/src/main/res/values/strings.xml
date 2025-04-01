@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Ziggle</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dating">Find</string>
+    <string name="like">Requests</string>
+    <string name="message">Message</string>
+    <string name="profile">Profile</string>
+
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+
+    <string name="terms_of_use">https://sites.google.com/view/ziggle-terms-of-use/home</string>
+    <string name="privacy_policy">https://sites.google.com/view/ziggle/home</string>
+
+    <string name="billing_text">By tapping continue, your payment will be charged to your google account, and your subscription will automatically renew for the same package length at the same price until you cancel in settings in the Google Play Store at least 24 hours prior to the end of the current period. By tapping continue, you agree to our Privacy Policy and Terms.</string>
+
+</resources>
