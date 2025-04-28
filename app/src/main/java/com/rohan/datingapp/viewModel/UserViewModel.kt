@@ -12,9 +12,9 @@ class UserViewModel: ViewModel() {
     val users = MutableStateFlow<List<UserModel>>(emptyList())
     val errorMessage = MutableStateFlow<String?>(null)
 
-    fun loadNextUsers(lastUserKey: String, pageSize: Int) {
+    fun loadNextUsers(uid: String, pageSize: Int){
         viewModelScope.launch {
-            repository.getNextUsers(lastUserKey, pageSize)
+            repository.getNextUsers(uid, pageSize)
                 .onSuccess { users.value = it }
                 .onFailure { errorMessage.value = it.message }
         }

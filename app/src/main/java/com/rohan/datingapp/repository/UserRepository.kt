@@ -7,9 +7,9 @@ import retrofit2.Response
 class UserRepository {
     private val apiService = UserClient.userService
 
-    suspend fun getNextUsers(lastUserKey: String, pageSize: Int): Result<List<UserModel>> {
+    suspend fun getNextUsers(uid: String, pageSize: Int): Result<List<UserModel>> {
         return try {
-            val response = apiService.getNextUsers(lastUserKey, pageSize)
+            val response = apiService.getNextUsers(uid, pageSize)
             handleResponse(response)
         } catch (e: Exception) {
             Result.failure(e)
