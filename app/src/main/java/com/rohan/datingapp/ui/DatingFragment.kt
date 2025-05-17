@@ -388,11 +388,19 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
         Config.showDialog(mContext)
 
         lifecycleScope.launch {
+            // Trigger API call to fetch next users
             userViewModel.users.collect { userList ->
                 // Update UI with the list of users
                 if (userList.isNotEmpty()) {
                     // Example: Display users in a RecyclerView or log them
+                    init()
 
+                    binding.cardStackView.layoutManager = manager
+                    binding.cardStackView.itemAnimator = DefaultItemAnimator()
+                    binding.cardStackView.adapter = adapter
+
+                    adapter.updateList(java.util.ArrayList(userViewModel.users.value))
+                    Config.hideDialog()
                 }
             }
         }
@@ -407,106 +415,105 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
             }
         }
 
-        // Trigger API call to fetch next users
         userViewModel.loadNextUsers(uid = FirebaseAuth.getInstance().currentUser!!.uid, pageSize = 10)
 
 
-        GlobalScope.launch {
-            val userDao = UserDao()
-
-            val currUser: UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
-                .await().getValue(UserModel::class.java)!!
-
-            name = currUser.name
-
-            val interact:ArrayList<String> = ArrayList()
-            val blockedUsersByMain:ArrayList<String> = ArrayList()
-
-            currUser.interact?.let { interact.addAll(it) }
-            currUser.blockedUsers?.let { blockedUsersByMain.addAll(it) }
-
-            if(rewindCheck == 1){
-                interact.remove(lastUserUid)
-            }
-
-            val allUsers = userDao.getAllUser().await()
-
-            list = arrayListOf()
-            for(data in allUsers.children){
-                if(list!!.size >= 15){
-                    break
-                }
-                val model = data.getValue(UserModel::class.java)
-                val interactUser : ArrayList<String> = ArrayList()
-                val blockedUsersBy : ArrayList<String> = ArrayList()
-                if(model?.interact != null){
-                    interactUser.addAll(model.interact)
-                }
-                if(model?.blockedUsers != null){
-                    blockedUsersBy.addAll(model.blockedUsers!!)
-                }
-                if(!blockedUsersByMain.contains(model?.uid)
-                    && !interact.contains(model?.uid)
-                    && !interactUser.contains(FirebaseAuth.getInstance().currentUser!!.uid)
-                    && model?.uid != FirebaseAuth.getInstance().currentUser!!.uid
-                    && !blockedUsersBy.contains(FirebaseAuth.getInstance().currentUser!!.uid)){
-
-                    when(genderCheck){
-                        1->{
-                            if(model?.gender == "Man"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        2->{
-                            if(model?.gender == "Woman"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        3->{
-                            when(distanceCheck){
-                                0->{
-                                    list!!.add(model!!)
-                                }
-                                1->{
-                                    if(model?.city == currUser.city){
-                                        list!!.add(model!!)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            withContext(Dispatchers.Main){
-                init()
-
-                binding.cardStackView.layoutManager = manager
-                binding.cardStackView.itemAnimator = DefaultItemAnimator()
-                binding.cardStackView.adapter = adapter
-
-                adapter.updateList(list!!)
-                Config.hideDialog()
-            }
-        }
+//        GlobalScope.launch {
+//            val userDao = UserDao()
+//
+//            val currUser: UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+//                .await().getValue(UserModel::class.java)!!
+//
+//            name = currUser.name
+//
+//            val interact:ArrayList<String> = ArrayList()
+//            val blockedUsersByMain:ArrayList<String> = ArrayList()
+//
+//            currUser.interact?.let { interact.addAll(it) }
+//            currUser.blockedUsers?.let { blockedUsersByMain.addAll(it) }
+//
+//            if(rewindCheck == 1){
+//                interact.remove(lastUserUid)
+//            }
+//
+//            val allUsers = userDao.getAllUser().await()
+//
+//            list = arrayListOf()
+//            for(data in allUsers.children){
+//                if(list!!.size >= 15){
+//                    break
+//                }
+//                val model = data.getValue(UserModel::class.java)
+//                val interactUser : ArrayList<String> = ArrayList()
+//                val blockedUsersBy : ArrayList<String> = ArrayList()
+//                if(model?.interact != null){
+//                    interactUser.addAll(model.interact)
+//                }
+//                if(model?.blockedUsers != null){
+//                    blockedUsersBy.addAll(model.blockedUsers!!)
+//                }
+//                if(!blockedUsersByMain.contains(model?.uid)
+//                    && !interact.contains(model?.uid)
+//                    && !interactUser.contains(FirebaseAuth.getInstance().currentUser!!.uid)
+//                    && model?.uid != FirebaseAuth.getInstance().currentUser!!.uid
+//                    && !blockedUsersBy.contains(FirebaseAuth.getInstance().currentUser!!.uid)){
+//
+//                    when(genderCheck){
+//                        1->{
+//                            if(model?.gender == "Man"){
+//                                when(distanceCheck){
+//                                    0->{
+//                                        list!!.add(model)
+//                                    }
+//                                    1->{
+//                                        if(model.city == currUser.city){
+//                                            list!!.add(model)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        2->{
+//                            if(model?.gender == "Woman"){
+//                                when(distanceCheck){
+//                                    0->{
+//                                        list!!.add(model)
+//                                    }
+//                                    1->{
+//                                        if(model.city == currUser.city){
+//                                            list!!.add(model)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        3->{
+//                            when(distanceCheck){
+//                                0->{
+//                                    list!!.add(model!!)
+//                                }
+//                                1->{
+//                                    if(model?.city == currUser.city){
+//                                        list!!.add(model!!)
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            withContext(Dispatchers.Main){
+//                init()
+//
+//                binding.cardStackView.layoutManager = manager
+//                binding.cardStackView.itemAnimator = DefaultItemAnimator()
+//                binding.cardStackView.adapter = adapter
+//
+//                adapter.updateList(list!!)
+//                Config.hideDialog()
+//            }
+//        }
     }
 
     override fun add() {
