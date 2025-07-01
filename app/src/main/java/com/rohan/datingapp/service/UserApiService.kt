@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface UserApiService {
     @GET("/users/getNextUsers")
     suspend fun getNextUsers(
-        @Query("lastUserKey") lastUserKey: String,
+        @Query("uid") lastUserKey: String,
         @Query("pageSize") pageSize: Int
     ): Response<List<UserModel>>
 

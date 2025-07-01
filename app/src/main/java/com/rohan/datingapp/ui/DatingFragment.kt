@@ -15,6 +15,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 //import com.google.android.gms.ads.AdError
@@ -36,6 +38,7 @@ import com.rohan.datingapp.notification.NotificationModel
 import com.rohan.datingapp.notification.PushNotificationModel
 import com.rohan.datingapp.utils.Config
 import com.rohan.datingapp.utils.OverlapDecoration
+import com.rohan.datingapp.viewModel.UserViewModel
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
@@ -68,6 +71,7 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
     private var rewindCheck: Int = 0
     private var isPremium: Int = 0
     private lateinit var settings: SharedPreferences
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -383,102 +387,133 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
     private fun getData() {
         Config.showDialog(mContext)
 
-        GlobalScope.launch {
-            val userDao = UserDao()
+        lifecycleScope.launch {
+            // Trigger API call to fetch next users
+            userViewModel.users.collect { userList ->
+                // Update UI with the list of users
+                if (userList.isNotEmpty()) {
+                    // Example: Display users in a RecyclerView or log them
+                    init()
 
-            val currUser: UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
-                .await().getValue(UserModel::class.java)!!
+                    binding.cardStackView.layoutManager = manager
+                    binding.cardStackView.itemAnimator = DefaultItemAnimator()
+                    binding.cardStackView.adapter = adapter
 
-            name = currUser.name
-
-            val interact:ArrayList<String> = ArrayList()
-            val blockedUsersByMain:ArrayList<String> = ArrayList()
-
-            currUser.interact?.let { interact.addAll(it) }
-            currUser.blockedUsers?.let { blockedUsersByMain.addAll(it) }
-
-            if(rewindCheck == 1){
-                interact.remove(lastUserUid)
-            }
-
-            val allUsers = userDao.getAllUser().await()
-
-            list = arrayListOf()
-            for(data in allUsers.children){
-                if(list!!.size >= 15){
-                    break
+                    adapter.updateList(java.util.ArrayList(userViewModel.users.value))
+                    Config.hideDialog()
                 }
-                val model = data.getValue(UserModel::class.java)
-                val interactUser : ArrayList<String> = ArrayList()
-                val blockedUsersBy : ArrayList<String> = ArrayList()
-                if(model?.interact != null){
-                    interactUser.addAll(model.interact)
-                }
-                if(model?.blockedUsers != null){
-                    blockedUsersBy.addAll(model.blockedUsers!!)
-                }
-                if(!blockedUsersByMain.contains(model?.uid)
-                    && !interact.contains(model?.uid)
-                    && !interactUser.contains(FirebaseAuth.getInstance().currentUser!!.uid)
-                    && model?.uid != FirebaseAuth.getInstance().currentUser!!.uid
-                    && !blockedUsersBy.contains(FirebaseAuth.getInstance().currentUser!!.uid)){
-
-                    when(genderCheck){
-                        1->{
-                            if(model?.gender == "Man"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        2->{
-                            if(model?.gender == "Woman"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        3->{
-                            when(distanceCheck){
-                                0->{
-                                    list!!.add(model!!)
-                                }
-                                1->{
-                                    if(model?.city == currUser.city){
-                                        list!!.add(model!!)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            withContext(Dispatchers.Main){
-                init()
-
-                binding.cardStackView.layoutManager = manager
-                binding.cardStackView.itemAnimator = DefaultItemAnimator()
-                binding.cardStackView.adapter = adapter
-
-                adapter.updateList(list!!)
-                Config.hideDialog()
             }
         }
+
+        // Observe errorMessage flow from ViewModel
+        lifecycleScope.launch {
+            userViewModel.errorMessage.collect { error ->
+                error?.let {
+                    // Handle error (e.g., show a Toast or Snackbar)
+                    println("Error: $it")
+                }
+            }
+        }
+
+        userViewModel.loadNextUsers(uid = FirebaseAuth.getInstance().currentUser!!.uid, pageSize = 10)
+
+
+//        GlobalScope.launch {
+//            val userDao = UserDao()
+//
+//            val currUser: UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+//                .await().getValue(UserModel::class.java)!!
+//
+//            name = currUser.name
+//
+//            val interact:ArrayList<String> = ArrayList()
+//            val blockedUsersByMain:ArrayList<String> = ArrayList()
+//
+//            currUser.interact?.let { interact.addAll(it) }
+//            currUser.blockedUsers?.let { blockedUsersByMain.addAll(it) }
+//
+//            if(rewindCheck == 1){
+//                interact.remove(lastUserUid)
+//            }
+//
+//            val allUsers = userDao.getAllUser().await()
+//
+//            list = arrayListOf()
+//            for(data in allUsers.children){
+//                if(list!!.size >= 15){
+//                    break
+//                }
+//                val model = data.getValue(UserModel::class.java)
+//                val interactUser : ArrayList<String> = ArrayList()
+//                val blockedUsersBy : ArrayList<String> = ArrayList()
+//                if(model?.interact != null){
+//                    interactUser.addAll(model.interact)
+//                }
+//                if(model?.blockedUsers != null){
+//                    blockedUsersBy.addAll(model.blockedUsers!!)
+//                }
+//                if(!blockedUsersByMain.contains(model?.uid)
+//                    && !interact.contains(model?.uid)
+//                    && !interactUser.contains(FirebaseAuth.getInstance().currentUser!!.uid)
+//                    && model?.uid != FirebaseAuth.getInstance().currentUser!!.uid
+//                    && !blockedUsersBy.contains(FirebaseAuth.getInstance().currentUser!!.uid)){
+//
+//                    when(genderCheck){
+//                        1->{
+//                            if(model?.gender == "Man"){
+//                                when(distanceCheck){
+//                                    0->{
+//                                        list!!.add(model)
+//                                    }
+//                                    1->{
+//                                        if(model.city == currUser.city){
+//                                            list!!.add(model)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        2->{
+//                            if(model?.gender == "Woman"){
+//                                when(distanceCheck){
+//                                    0->{
+//                                        list!!.add(model)
+//                                    }
+//                                    1->{
+//                                        if(model.city == currUser.city){
+//                                            list!!.add(model)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        3->{
+//                            when(distanceCheck){
+//                                0->{
+//                                    list!!.add(model!!)
+//                                }
+//                                1->{
+//                                    if(model?.city == currUser.city){
+//                                        list!!.add(model!!)
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            withContext(Dispatchers.Main){
+//                init()
+//
+//                binding.cardStackView.layoutManager = manager
+//                binding.cardStackView.itemAnimator = DefaultItemAnimator()
+//                binding.cardStackView.adapter = adapter
+//
+//                adapter.updateList(list!!)
+//                Config.hideDialog()
+//            }
+//        }
     }
 
     override fun add() {

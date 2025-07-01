@@ -7,14 +7,14 @@ import com.rohan.datingapp.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class UserViewModel: ViewModel() {
+class UserViewModel : ViewModel() {
     private val repository = UserRepository()
     val users = MutableStateFlow<List<UserModel>>(emptyList())
     val errorMessage = MutableStateFlow<String?>(null)
 
-    fun loadNextUsers(lastUserKey: String, pageSize: Int) {
+    fun loadNextUsers(uid: String, pageSize: Int) {
         viewModelScope.launch {
-            repository.getNextUsers(lastUserKey, pageSize)
+            repository.getNextUsers(uid, pageSize)
                 .onSuccess { users.value = it }
                 .onFailure { errorMessage.value = it.message }
         }
