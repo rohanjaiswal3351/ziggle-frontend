@@ -4,9 +4,8 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rohan.datingapp.R
+import java.util.Objects
 
 object Config {
 
@@ -27,7 +26,9 @@ object Config {
     }
 
     fun hideDialog(){
-        dialog!!.dismiss()
+        if(Objects.nonNull(dialog)){
+            dialog?.dismiss()
+        }
     }
 
 }

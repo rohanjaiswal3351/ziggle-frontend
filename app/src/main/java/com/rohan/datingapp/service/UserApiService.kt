@@ -11,13 +11,27 @@ import retrofit2.http.Query
 
 interface UserApiService {
 
-    @GET("/users/getNextValidUsers")
+    @GET("users/getNextValidUsers")
     suspend fun getNextValidUsers(
         @Query("uid") uid: String,
         @Query("rewindCheck") rewindCheck: Int,
         @Query("genderCheck") genderCheck: Int,
         @Query("distanceCheck") distanceCheck: Int,
         @Query("lastUserUid") lastUserUid: String): Response<List<UserModel>>
+
+    @GET("users/getLikedUsers")
+    suspend fun getLikedUsers(
+        @Query("uid") uid:String
+    ): Response<List<UserModel>>
+
+    @GET("users/getFriends")
+    suspend fun getFriends(
+        @Query("uid") uid:String
+    ): Response<List<UserModel>>
+
+    @GET("users/getAllUsers")
+    suspend fun getAllUsers(): Response<List<UserModel>>
+
     @GET("/users/getNextUsers")
     suspend fun getNextUsers(
         @Query("lastUserKey") lastUserKey: String,

@@ -19,7 +19,7 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "API_BASE_URL", "\"http://localhost:8080/\""
+            buildConfigField "String", "API_BASE_URL", "\"http://10.227.16.192:8080/\""
         }
         release {
             buildConfigField "String", "API_BASE_URL", "\"http://prod-server-ip:8080/\""

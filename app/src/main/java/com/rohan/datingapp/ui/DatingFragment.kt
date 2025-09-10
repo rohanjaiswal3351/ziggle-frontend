@@ -1,6 +1,5 @@
 package com.rohan.datingapp.ui
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -15,14 +14,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-//import com.google.android.gms.ads.AdError
-//import com.google.android.gms.ads.AdRequest
-//import com.google.android.gms.ads.FullScreenContentCallback
-//import com.google.android.gms.ads.LoadAdError
-//import com.google.android.gms.ads.interstitial.InterstitialAd
-//import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.rohan.datingapp.R
 import com.rohan.datingapp.activity.BuyPremiumActivity
@@ -35,18 +29,14 @@ import com.rohan.datingapp.notification.ApiUtilities
 import com.rohan.datingapp.notification.NotificationModel
 import com.rohan.datingapp.notification.PushNotificationModel
 import com.rohan.datingapp.utils.Config
-import com.rohan.datingapp.utils.OverlapDecoration
+import com.rohan.datingapp.viewModel.UserViewModel
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.Duration
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting
-import com.yuyakaido.android.cardstackview.SwipeableMethod
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,6 +59,8 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
     private var isPremium: Int = 0
     private lateinit var settings: SharedPreferences
 
+    private val userViewModel: UserViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,6 +70,7 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
 
         adapter = DatingAdapter(mContext, this)
 
+        setupUserCollection()
         getData()
 
         dialog = Dialog(mContext)
@@ -215,6 +208,42 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
         }
 
         return binding.root
+    }
+
+    private fun setupUserCollection(){
+        lifecycleScope.launch {
+            userViewModel.users.collectLatest { users ->
+                // Update UI here with the new user list
+                if (users.isNotEmpty()) {
+                    init()
+                    list = users as ArrayList<UserModel>?
+
+                    binding.cardStackView.layoutManager = manager
+                    binding.cardStackView.itemAnimator = DefaultItemAnimator()
+                    binding.cardStackView.adapter = adapter
+
+                    adapter.updateList(list!!)
+                    Config.hideDialog()
+                }
+
+                userViewModel.loading.collectLatest { isLoading ->
+                    if (isLoading) {
+                        Config.showDialog(mContext)
+                    } else {
+                        Config.hideDialog()
+                    }
+                }
+            }
+        }
+
+        // Collect error messages
+        lifecycleScope.launch {
+            userViewModel.errorMessage.collectLatest { error ->
+                error?.let {
+                    println("Error: $it")
+                }
+            }
+        }
     }
 
     private fun showRewindDialog() {
@@ -381,104 +410,14 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
     }
 
     private fun getData() {
-        Config.showDialog(mContext)
 
-        GlobalScope.launch {
-            val userDao = UserDao()
-
-            val currUser: UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
-                .await().getValue(UserModel::class.java)!!
-
-            name = currUser.name
-
-            val interact:ArrayList<String> = ArrayList()
-            val blockedUsersByMain:ArrayList<String> = ArrayList()
-
-            currUser.interact?.let { interact.addAll(it) }
-            currUser.blockedUsers?.let { blockedUsersByMain.addAll(it) }
-
-            if(rewindCheck == 1){
-                interact.remove(lastUserUid)
-            }
-
-            val allUsers = userDao.getAllUser().await()
-
-            list = arrayListOf()
-            for(data in allUsers.children){
-                if(list!!.size >= 15){
-                    break
-                }
-                val model = data.getValue(UserModel::class.java)
-                val interactUser : ArrayList<String> = ArrayList()
-                val blockedUsersBy : ArrayList<String> = ArrayList()
-                if(model?.interact != null){
-                    interactUser.addAll(model.interact)
-                }
-                if(model?.blockedUsers != null){
-                    blockedUsersBy.addAll(model.blockedUsers!!)
-                }
-                if(!blockedUsersByMain.contains(model?.uid)
-                    && !interact.contains(model?.uid)
-                    && !interactUser.contains(FirebaseAuth.getInstance().currentUser!!.uid)
-                    && model?.uid != FirebaseAuth.getInstance().currentUser!!.uid
-                    && !blockedUsersBy.contains(FirebaseAuth.getInstance().currentUser!!.uid)){
-
-                    when(genderCheck){
-                        1->{
-                            if(model?.gender == "Man"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        2->{
-                            if(model?.gender == "Woman"){
-                                when(distanceCheck){
-                                    0->{
-                                        list!!.add(model)
-                                    }
-                                    1->{
-                                        if(model.city == currUser.city){
-                                            list!!.add(model)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        3->{
-                            when(distanceCheck){
-                                0->{
-                                    list!!.add(model!!)
-                                }
-                                1->{
-                                    if(model?.city == currUser.city){
-                                        list!!.add(model!!)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            withContext(Dispatchers.Main){
-                init()
-
-                binding.cardStackView.layoutManager = manager
-                binding.cardStackView.itemAnimator = DefaultItemAnimator()
-                binding.cardStackView.adapter = adapter
-
-                adapter.updateList(list!!)
-                Config.hideDialog()
-            }
-        }
+        userViewModel.loadNextValidUsers(
+            FirebaseAuth.getInstance().currentUser!!.uid,
+            rewindCheck,
+            genderCheck,
+            distanceCheck,
+            lastUserUid
+        )
     }
 
     override fun add() {
