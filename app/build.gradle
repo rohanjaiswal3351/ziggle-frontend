@@ -19,7 +19,7 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "API_BASE_URL", "\"http://10.227.16.192:8080/\""
+            buildConfigField "String", "API_BASE_URL", "\"http://10.0.2.2:8080/\""
         }
         release {
             buildConfigField "String", "API_BASE_URL", "\"http://prod-server-ip:8080/\""
@@ -93,4 +93,6 @@ dependencies {
     implementation("com.github.ybq:Android-SpinKit:1.4.0")
 
     implementation("io.adapty:android-sdk:2.11.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
 }

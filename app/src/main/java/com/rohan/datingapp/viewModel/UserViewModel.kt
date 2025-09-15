@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 
 class UserViewModel: ViewModel() {
     private val repository = UserRepository()
+    val user = MutableStateFlow(UserModel())
     val users = MutableStateFlow<List<UserModel>>(emptyList())
     val usersV2 = MutableStateFlow<List<UserModel>>(emptyList())
     val errorMessage = MutableStateFlow<String?>(null)
@@ -52,7 +53,7 @@ class UserViewModel: ViewModel() {
         }
     }
 
-    fun getFriends(uid:  String){
+    fun getFriends(uid: String){
         viewModelScope.launch {
             repository.getFriends(uid)
                 .onSuccess { usersV2.value = it }
@@ -72,6 +73,14 @@ class UserViewModel: ViewModel() {
         viewModelScope.launch {
             repository.getNextUsers(lastUserKey, pageSize)
                 .onSuccess { users.value = it }
+                .onFailure { errorMessage.value = it.message }
+        }
+    }
+
+    fun getUserById(uid: String){
+        viewModelScope.launch {
+            repository.getUserById(uid)
+                .onSuccess { user.value = it }
                 .onFailure { errorMessage.value = it.message }
         }
     }

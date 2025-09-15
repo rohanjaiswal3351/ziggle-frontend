@@ -26,6 +26,30 @@ class UserRepository {
         }
     }
 
+    suspend fun updateUser(
+        user: UserModel
+    ): Result<Unit> {
+        return try {
+            val response = apiService.updateUser(user)
+            Log.d("ApiResponse", "${response}")
+            handleResponse(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getUserById(
+        uid: String
+    ): Result<UserModel> {
+        return try {
+            val response = apiService.getUserById(uid)
+            Log.d("ApiResponse", "${response}")
+            handleResponse(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getAllUsers(): Result<List<UserModel>> {
         return try {
             val response = apiService.getAllUsers()

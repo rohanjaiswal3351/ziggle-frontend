@@ -19,6 +19,11 @@ interface UserApiService {
         @Query("distanceCheck") distanceCheck: Int,
         @Query("lastUserUid") lastUserUid: String): Response<List<UserModel>>
 
+    @GET("users/getUserById")
+    suspend fun getUserById(
+        @Query("uid") uid: String
+    ): Response<UserModel>
+
     @GET("users/getLikedUsers")
     suspend fun getLikedUsers(
         @Query("uid") uid:String
@@ -39,6 +44,9 @@ interface UserApiService {
 
     @POST("/users/addUser")
     suspend fun addUser(@Body user: UserModel): Response<Unit>
+
+    @POST("/users/updateUser")
+    suspend fun updateUser(@Body user: UserModel): Response<Unit>
 
     @DELETE("/users/deleteUser")
     suspend fun deleteUser(@Query("uid") uid: String): Response<Unit>

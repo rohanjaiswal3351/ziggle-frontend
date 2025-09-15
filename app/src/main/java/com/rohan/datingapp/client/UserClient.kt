@@ -1,7 +1,8 @@
 package com.rohan.datingapp.client
 
-//import com.rohan.datingapp
 import com.rohan.datingapp.BuildConfig
+import com.rohan.datingapp.service.MessageApiService
+import com.rohan.datingapp.service.StorageApiService
 import com.rohan.datingapp.service.UserApiService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -23,5 +24,13 @@ object UserClient {
 
     val userService: UserApiService by lazy {
         retrofit.create(UserApiService::class.java)
+    }
+
+    val messageService: MessageApiService by lazy {
+        retrofit.create(MessageApiService::class.java)
+    }
+
+    val storageService: StorageApiService by lazy {
+        retrofit.create(StorageApiService::class.java)
     }
 }

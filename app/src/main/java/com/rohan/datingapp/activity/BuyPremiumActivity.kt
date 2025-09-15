@@ -8,9 +8,6 @@ import android.widget.Toast
 import com.adapty.Adapty
 import com.adapty.models.AdaptyPaywallProduct
 import com.adapty.utils.AdaptyResult
-//import com.adapty.Adapty
-//import com.adapty.models.AdaptyPaywallProduct
-//import com.adapty.utils.AdaptyResult
 import com.rohan.datingapp.databinding.ActivityBuyPremiumBinding
 import com.rohan.datingapp.utils.Config
 
@@ -56,7 +53,6 @@ class BuyPremiumActivity : AppCompatActivity() {
                     }
                 }
                 is AdaptyResult.Error -> {
-                    //val error = result.error
                     Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -105,7 +101,6 @@ class BuyPremiumActivity : AppCompatActivity() {
                     }
                 }
                 is AdaptyResult.Error -> {
-                    //val error = result0.error
                     Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show()
                     Config.hideDialog()
                 }
@@ -118,12 +113,10 @@ class BuyPremiumActivity : AppCompatActivity() {
         Adapty.makePurchase(this, adaptyPaywallProduct) { result ->
             when (result) {
                 is AdaptyResult.Success -> {
-                    //val profile = result.value
                     Toast.makeText(this, "You are a premium user now", Toast.LENGTH_SHORT).show()
                     Toast.makeText(this, "It will take some time to see changes.", Toast.LENGTH_LONG).show()
                 }
                 is AdaptyResult.Error -> {
-                    //val error = result.error
                     Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show()
                 }
             }

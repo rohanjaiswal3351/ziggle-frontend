@@ -65,10 +65,10 @@ class LikeFragment : Fragment() {
                     binding.text1.visibility = View.VISIBLE
                     friendAdapterList = ArrayList()
                     friendAdapterList = (usersV2 as ArrayList<UserModel>?)!!
-                    val adapter = LikeAdapter(mContext)
-                    binding.recyclerView.layoutManager = LinearLayoutManager(mContext)
-                    binding.recyclerView.adapter = adapter
-                    adapter.updateList(friendAdapterList)
+                    val friendAdapter = FriendsAdapter(mContext)
+                    binding.friendRecyclerView.layoutManager = LinearLayoutManager(mContext , LinearLayoutManager.HORIZONTAL, false)
+                    binding.friendRecyclerView.adapter = friendAdapter
+                    friendAdapter.updateList(friendAdapterList)
                 }
 
                 userViewModel.users.collectLatest { users ->

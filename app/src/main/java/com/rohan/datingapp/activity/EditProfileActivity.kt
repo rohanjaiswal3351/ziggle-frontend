@@ -2,7 +2,6 @@ package com.rohan.datingapp.activity
 
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -19,17 +18,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.rohan.datingapp.R
 import com.rohan.datingapp.adapter.ShowInterestAdapter
-import com.rohan.datingapp.daos.UserDao
 import com.rohan.datingapp.databinding.ActivityEditProfileBinding
 import com.rohan.datingapp.model.UserModel
+import com.rohan.datingapp.repository.StorageRepository
+import com.rohan.datingapp.repository.UserRepository
+import com.rohan.datingapp.request.UploadFileRequest
 import com.rohan.datingapp.utils.Config
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
-import java.io.ByteArrayOutputStream
+import okhttp3.MultipartBody
+import java.io.File
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
+import androidx.core.graphics.drawable.toDrawable
 
 
 class EditProfileActivity : AppCompatActivity() {
@@ -199,6 +201,7 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun showDeleteDialog(check: Int){
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.delete_dialog)
@@ -206,264 +209,416 @@ class EditProfileActivity : AppCompatActivity() {
         val cancel = dialog.findViewById<TextView>(R.id.cancel)
 
         delete.setOnClickListener {
-            val userDao = UserDao()
-            val mFirebaseStorage = FirebaseStorage.getInstance()
+            GlobalScope.launch {
+                val userRepository = UserRepository()
+                val storageRepository = StorageRepository()
+                var user = UserModel()
 
-            when (check) {
-                1 -> {
-                    userDao.deleteImage1(FirebaseAuth.getInstance().currentUser!!.uid)
-                    val photoRef: StorageReference = mFirebaseStorage.getReferenceFromUrl(imageUrl1)
-                    photoRef.delete().addOnSuccessListener {
-                        Toast.makeText(this , "Deleted", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
-                    }.addOnFailureListener {
-                        dialog.dismiss()
-                        Toast.makeText(this , "something went wrong", Toast.LENGTH_SHORT).show()
+                userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                    .onSuccess {
+                        user = it
                     }
-                    binding.delete1.visibility = View.GONE
-                    binding.image1.visibility = View.GONE
-                    binding.show1.visibility = View.VISIBLE
-                }
-                2 -> {
-                    userDao.deleteImage2(FirebaseAuth.getInstance().currentUser!!.uid)
-                    val photoRef: StorageReference = mFirebaseStorage.getReferenceFromUrl(imageUrl2)
-                    photoRef.delete().addOnSuccessListener {
-                        Toast.makeText(this , "Deleted", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
-                    }.addOnFailureListener {
-                        Toast.makeText(this , "something went wrong", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+                    .onFailure {
+                        Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
                     }
-                    binding.delete2.visibility = View.GONE
-                    binding.image2.visibility = View.GONE
-                    binding.show2.visibility = View.VISIBLE
-                    binding.delete1.visibility = View.VISIBLE
-                }
-                3 -> {
-                    userDao.deleteImage3(FirebaseAuth.getInstance().currentUser!!.uid)
-                    val photoRef: StorageReference = mFirebaseStorage.getReferenceFromUrl(imageUrl3)
-                    photoRef.delete().addOnSuccessListener {
-                        Toast.makeText(this , "Deleted", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
-                    }.addOnFailureListener {
-                        Toast.makeText(this , "something went wrong", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
+
+                withContext(Dispatchers.Main){
+                    when (check) {
+                        1 -> {
+                            user.image1 = null
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    storageRepository.deleteFile("profile/${FirebaseAuth.getInstance().currentUser!!.uid}/image1.jpg")
+                                        .onSuccess {
+                                            Toast.makeText(this@EditProfileActivity , "Deleted", Toast.LENGTH_SHORT).show()
+                                            dialog.dismiss()
+                                        }
+                                        .onFailure {
+                                            dialog.dismiss()
+                                            Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                        }
+                                }.onFailure {
+                                    Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                }
+                            binding.delete1.visibility = View.GONE
+                            binding.image1.visibility = View.GONE
+                            binding.show1.visibility = View.VISIBLE
+                        }
+                        2 -> {
+                            user.image2 = null
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    storageRepository.deleteFile("profile/${FirebaseAuth.getInstance().currentUser!!.uid}/image2.jpg")
+                                        .onSuccess {
+                                            Toast.makeText(this@EditProfileActivity , "Deleted", Toast.LENGTH_SHORT).show()
+                                            dialog.dismiss()
+                                        }
+                                        .onFailure {
+                                            dialog.dismiss()
+                                            Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                        }
+                                }.onFailure {
+                                    Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                }
+                            binding.delete2.visibility = View.GONE
+                            binding.image2.visibility = View.GONE
+                            binding.show2.visibility = View.VISIBLE
+                            binding.delete1.visibility = View.VISIBLE
+                        }
+                        3 -> {
+                            user.image3 = null
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    storageRepository.deleteFile("profile/${FirebaseAuth.getInstance().currentUser!!.uid}/image3.jpg")
+                                        .onSuccess {
+                                            Toast.makeText(this@EditProfileActivity , "Deleted", Toast.LENGTH_SHORT).show()
+                                            dialog.dismiss()
+                                        }
+                                        .onFailure {
+                                            dialog.dismiss()
+                                            Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                        }
+                                }.onFailure {
+                                    Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                                    dialog.dismiss()
+                                }
+                            binding.delete3.visibility = View.GONE
+                            binding.image3.visibility = View.GONE
+                            binding.show3.visibility = View.VISIBLE
+                            binding.delete2.visibility = View.VISIBLE
+                        }
                     }
-                    binding.delete3.visibility = View.GONE
-                    binding.image3.visibility = View.GONE
-                    binding.show3.visibility = View.VISIBLE
-                    binding.delete2.visibility = View.VISIBLE
                 }
             }
-
         }
 
         cancel.setOnClickListener {
             dialog.dismiss()
         }
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         dialog.show()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun storeSocial(check: Int, id: String) {
         Config.showDialog(this)
-        if(check == 0){
-            val userDao = UserDao()
-            userDao.updateInsta(FirebaseAuth.getInstance().currentUser!!.uid , id)
-            binding.checkInsta.visibility = View.GONE
-            Config.hideDialog()
-            Toast.makeText(this , "Instagram updated successfully", Toast.LENGTH_SHORT).show()
-        }else if(check == 1){
-            val userDao = UserDao()
-            userDao.updateSnap(FirebaseAuth.getInstance().currentUser!!.uid , id)
-            binding.checkSnap.visibility = View.GONE
-            Config.hideDialog()
-            Toast.makeText(this , "Snapchat updated successfully", Toast.LENGTH_SHORT).show()
+
+        GlobalScope.launch {
+            val userRepository = UserRepository()
+
+            userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                .onSuccess {
+                    val user = it
+                    if(check == 0){
+                        user.instaId = id
+                        binding.checkInsta.visibility = View.GONE
+                    }else{
+                        user.snapId = id
+                        binding.checkSnap.visibility = View.GONE
+                    }
+                    userRepository.updateUser(user)
+                        .onSuccess {
+                            Config.hideDialog()
+                            Toast.makeText(this@EditProfileActivity , "Social updated successfully", Toast.LENGTH_SHORT).show()
+                        }
+                        .onFailure {
+                            Config.hideDialog()
+                        }
+
+                }
+                .onFailure {
+                    Config.hideDialog()
+                }
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun loadContent() {
         Config.showDialog(this)
-
-        val userDao = UserDao()
-
         GlobalScope.launch {
-            val user:UserModel = userDao.getUserById(FirebaseAuth.getInstance().currentUser!!.uid).await().getValue(UserModel::class.java)!!
+            val userRepository = UserRepository()
 
-            withContext(Dispatchers.Main){
-                if (user.interests != null){
-                    binding.interestLayout.visibility = View.VISIBLE
-                    val gridLayoutManager = GridLayoutManager(
-                        this@EditProfileActivity , 2, GridLayoutManager.VERTICAL, false
-                    )
+            userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                .onSuccess {
+                    withContext(Dispatchers.Main){
+                        if (it.interests != null){
+                            binding.interestLayout.visibility = View.VISIBLE
+                            val gridLayoutManager = GridLayoutManager(
+                                this@EditProfileActivity , 2, GridLayoutManager.VERTICAL, false
+                            )
 
-                    val interestAdapter = ShowInterestAdapter(this@EditProfileActivity)
-                    binding.recyclerView.layoutManager = gridLayoutManager
-                    binding.recyclerView.adapter = interestAdapter
-                    interestAdapter.updateList(user.interests!!)
+                            val interestAdapter = ShowInterestAdapter(this@EditProfileActivity)
+                            binding.recyclerView.layoutManager = gridLayoutManager
+                            binding.recyclerView.adapter = interestAdapter
+                            interestAdapter.updateList(it.interests!!)
+                        }
+
+                        if(it.bio!!.isNotEmpty()){
+                            binding.bio.setText(it.bio)
+                        }
+
+                        if(it.instaId!!.isNotEmpty()){
+                            binding.addInsta.setText(it.instaId)
+                            binding.checkInsta.visibility = View.GONE
+                        }
+
+                        if(it.snapId!!.isNotEmpty()){
+                            binding.addSnap.setText(it.snapId)
+                            binding.checkSnap.visibility = View.GONE
+                        }
+
+                        if(it.image!!.isNotEmpty()){
+                            binding.show.visibility = View.GONE
+                            binding.image.visibility = View.VISIBLE
+                            Glide.with(this@EditProfileActivity).load(it.image).into(binding.image)
+                        }
+
+                        if(it.image1!!.isNotEmpty()){
+                            binding.delete1.visibility = View.VISIBLE
+                            binding.show1.visibility = View.GONE
+                            binding.image1.visibility = View.VISIBLE
+                            Glide.with(this@EditProfileActivity).load(it.image1).into(binding.image1)
+                            imageUrl1 = it.image1!!
+                        }
+
+                        if(it.image2!!.isNotEmpty()){
+                            binding.delete1.visibility = View.GONE
+                            binding.delete2.visibility = View.VISIBLE
+                            binding.show2.visibility = View.GONE
+                            binding.image2.visibility = View.VISIBLE
+                            Glide.with(this@EditProfileActivity).load(it.image2).into(binding.image2)
+                            imageUrl2 = it.image2!!
+                        }
+
+                        if(it.image3!!.isNotEmpty()){
+                            binding.delete2.visibility = View.GONE
+                            binding.delete3.visibility = View.VISIBLE
+                            binding.show3.visibility = View.GONE
+                            binding.image3.visibility = View.VISIBLE
+                            Glide.with(this@EditProfileActivity).load(it.image3).into(binding.image3)
+                            imageUrl3 = it.image3!!
+                        }
+
+                        if(it.education!!.isNotEmpty()){
+                            binding.educationTxt.text = it.education.toString()
+                            binding.educationTxt.setTextColor(Color.BLACK)
+                        }
+
+                        if(it.gender!!.isNotEmpty()){
+                            binding.genderTxt.text = it.gender.toString()
+                            binding.genderTxt.setTextColor(Color.BLACK)
+                        }
+
+                        if(it.city!!.isNotEmpty()){
+                            binding.locationTxt.text = it.city.toString()
+                            binding.locationTxt.setTextColor(Color.BLACK)
+                        }
+
+                        if(it.height!!.isNotEmpty()){
+                            binding.heightTxt.text = it.height.toString()
+                            binding.heightTxt.setTextColor(Color.BLACK)
+                        }
+
+                        if(it.exercise!!.isNotEmpty()){
+                            binding.exerciseTxt.text = it.exercise.toString()
+                            binding.exerciseTxt.setTextColor(Color.BLACK)
+                        }
+
+                        if(it.star!!.isNotEmpty()){
+                            binding.starTxt.text = it.star.toString()
+                            binding.starTxt.setTextColor(Color.BLACK)
+                        }
+
+                        Config.hideDialog()
+                    }
                 }
-
-                if(user.bio!!.isNotEmpty()){
-                    binding.bio.setText(user.bio)
+                .onFailure {
+                    Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                    Config.hideDialog()
                 }
-
-                if(user.instaId!!.isNotEmpty()){
-                    binding.addInsta.setText(user.instaId)
-                    binding.checkInsta.visibility = View.GONE
-                }
-
-                if(user.snapId!!.isNotEmpty()){
-                    binding.addSnap.setText(user.snapId)
-                    binding.checkSnap.visibility = View.GONE
-                }
-
-                if(user.image!!.isNotEmpty()){
-                    binding.show.visibility = View.GONE
-                    binding.image.visibility = View.VISIBLE
-                    Glide.with(this@EditProfileActivity).load(user.image).into(binding.image)
-                }
-
-                if(user.image1!!.isNotEmpty()){
-                    binding.delete1.visibility = View.VISIBLE
-                    binding.show1.visibility = View.GONE
-                    binding.image1.visibility = View.VISIBLE
-                    Glide.with(this@EditProfileActivity).load(user.image1).into(binding.image1)
-                    imageUrl1 = user.image1!!
-                }
-
-                if(user.image2!!.isNotEmpty()){
-                    binding.delete1.visibility = View.GONE
-                    binding.delete2.visibility = View.VISIBLE
-                    binding.show2.visibility = View.GONE
-                    binding.image2.visibility = View.VISIBLE
-                    Glide.with(this@EditProfileActivity).load(user.image2).into(binding.image2)
-                    imageUrl2 = user.image2!!
-                }
-
-                if(user.image3!!.isNotEmpty()){
-                    binding.delete2.visibility = View.GONE
-                    binding.delete3.visibility = View.VISIBLE
-                    binding.show3.visibility = View.GONE
-                    binding.image3.visibility = View.VISIBLE
-                    Glide.with(this@EditProfileActivity).load(user.image3).into(binding.image3)
-                    imageUrl3 = user.image3!!
-                }
-
-                if(user.education!!.isNotEmpty()){
-                    binding.educationTxt.text = user.education.toString()
-                    binding.educationTxt.setTextColor(Color.BLACK)
-                }
-
-                if(user.gender!!.isNotEmpty()){
-                    binding.genderTxt.text = user.gender.toString()
-                    binding.genderTxt.setTextColor(Color.BLACK)
-                }
-
-                if(user.city!!.isNotEmpty()){
-                    binding.locationTxt.text = user.city.toString()
-                    binding.locationTxt.setTextColor(Color.BLACK)
-                }
-
-                if(user.height!!.isNotEmpty()){
-                    binding.heightTxt.text = user.height.toString()
-                    binding.heightTxt.setTextColor(Color.BLACK)
-                }
-
-                if(user.exercise!!.isNotEmpty()){
-                    binding.exerciseTxt.text = user.exercise.toString()
-                    binding.exerciseTxt.setTextColor(Color.BLACK)
-                }
-
-                if(user.star!!.isNotEmpty()){
-                    binding.starTxt.text = user.star.toString()
-                    binding.starTxt.setTextColor(Color.BLACK)
-                }
-
-                Config.hideDialog()
-            }
-
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun storeBio(bio: String) {
         Config.showDialog(this)
 
-        val  userDao = UserDao()
-        userDao.updateBio(FirebaseAuth.getInstance().currentUser!!.uid , bio)
-        
-        Toast.makeText(this@EditProfileActivity , "Bio updated successfully!", Toast.LENGTH_SHORT).show()
-        Config.hideDialog()
+        GlobalScope.launch {
+            val userRepository = UserRepository()
+            userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                .onSuccess {
+                    val user = it
+                    user.bio = bio
+                    userRepository.updateUser(user)
+                        .onSuccess {
+                            Toast.makeText(this@EditProfileActivity , "Bio updated successfully!", Toast.LENGTH_SHORT).show()
+                            Config.hideDialog()
+                        }
+                        .onFailure {
+                            Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                            Config.hideDialog()
+                        }
+
+                }.onFailure {
+                    Toast.makeText(this@EditProfileActivity , "something went wrong", Toast.LENGTH_SHORT).show()
+                    Config.hideDialog()
+                }
+        }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun uploadImage(imageUri: Uri?, check: Int) {
         Config.showDialog(this)
 
-        val storageReference:StorageReference
+        val file = File(getRealPathFromURI(imageUri))
+        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-        if(check == 0){
-            storageReference = FirebaseStorage.getInstance().getReference("profile")
-                .child(FirebaseAuth.getInstance().currentUser!!.uid).child("profile.jpg")
-        }
-        else if(check == 1){
-            storageReference = FirebaseStorage.getInstance().getReference("profile")
-                .child(FirebaseAuth.getInstance().currentUser!!.uid).child("image1.jpg")
-        }
-        else if(check == 2){
-            storageReference = FirebaseStorage.getInstance().getReference("profile")
-                .child(FirebaseAuth.getInstance().currentUser!!.uid).child("image2.jpg")
-        }
-        else{
-            storageReference = FirebaseStorage.getInstance().getReference("profile")
-                .child(FirebaseAuth.getInstance().currentUser!!.uid).child("image3.jpg")
-        }
-
-        val bmp: Bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-        val bao = ByteArrayOutputStream()
-        bmp.compress(Bitmap.CompressFormat.JPEG, 25, bao)
-        val data = bao.toByteArray()
-
-        storageReference.putBytes(data)
-            .addOnSuccessListener {
-                storageReference.downloadUrl.addOnSuccessListener {
+        GlobalScope.launch {
+            val storageRepository = StorageRepository()
+            storageRepository.uploadFile(
+                UploadFileRequest(
+                    body,
+                    FirebaseAuth.getInstance().currentUser!!.uid,
+                    check
+                )
+            )
+                .onSuccess {
                     storeData(it , check)
-                }.addOnFailureListener {
                     Config.hideDialog()
-                    Toast.makeText(this , "something went wrong" , Toast.LENGTH_SHORT).show()
                 }
-            }.addOnFailureListener{
-                Config.hideDialog()
-                Toast.makeText(this , "something went wrong" , Toast.LENGTH_SHORT).show()
-            }
-
+                .onFailure {
+                    Config.hideDialog()
+                    Toast.makeText(this@EditProfileActivity , "something went wrong" , Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
-    private fun storeData(imageUrl: Uri? , check:Int) {
-        val userDao = UserDao()
+    private fun getRealPathFromURI(uri: Uri?): String {
+        val cursor = uri?.let { this.contentResolver.query(it, null, null, null, null) }
+        cursor?.moveToFirst()
+        val idx = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+        val path = cursor?.getString(idx ?: 0)
+        cursor?.close()
+        return path ?: ""
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun storeData(imageUrl: String, check:Int) {
+        val userRepository = UserRepository()
+        var user: UserModel
 
         when (check) {
             0 -> {
-                userDao.updateImage(FirebaseAuth.getInstance().currentUser!!.uid , imageUrl.toString())
-                Config.hideDialog()
+                GlobalScope.launch {
+                    userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .onSuccess {
+                            user = it
+                            user.image = imageUrl
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    Config.hideDialog()
+                                }
+                                .onFailure {
+                                    Config.hideDialog()
+                                }
+
+                        }
+                        .onFailure {
+                            Config.hideDialog()
+                            Toast.makeText(
+                                this@EditProfileActivity,
+                                "something went wrong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                }
             }
             1 -> {
-                imageUrl1 = imageUrl.toString()
-                userDao.updateImage1(FirebaseAuth.getInstance().currentUser!!.uid , imageUrl.toString())
-                Config.hideDialog()
+                GlobalScope.launch {
+                    userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .onSuccess {
+                            user = it
+                            user.image1 = imageUrl
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    Config.hideDialog()
+                                }
+                                .onFailure {
+                                    Config.hideDialog()
+                                }
+
+                        }
+                        .onFailure {
+                            Config.hideDialog()
+                            Toast.makeText(
+                                this@EditProfileActivity,
+                                "something went wrong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                }
+                imageUrl1 = imageUrl
                 binding.delete1.visibility = View.VISIBLE
             }
             2 -> {
-                imageUrl2 = imageUrl.toString()
-                userDao.updateImage2(FirebaseAuth.getInstance().currentUser!!.uid , imageUrl.toString())
-                Config.hideDialog()
+                GlobalScope.launch {
+                    userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .onSuccess {
+                            user = it
+                            user.image2 = imageUrl
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    Config.hideDialog()
+                                }
+                                .onFailure {
+                                    Config.hideDialog()
+                                }
+
+                        }
+                        .onFailure {
+                            Config.hideDialog()
+                            Toast.makeText(
+                                this@EditProfileActivity,
+                                "something went wrong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                }
+                imageUrl2 = imageUrl
                 binding.delete1.visibility = View.GONE
                 binding.delete2.visibility = View.VISIBLE
             }
             else -> {
-                imageUrl3 = imageUrl.toString()
-                userDao.updateImage3(FirebaseAuth.getInstance().currentUser!!.uid , imageUrl.toString())
-                Config.hideDialog()
+                GlobalScope.launch {
+                    userRepository.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .onSuccess {
+                            user = it
+                            user.image3 = imageUrl
+                            userRepository.updateUser(user)
+                                .onSuccess {
+                                    Config.hideDialog()
+                                }
+                                .onFailure {
+                                    Config.hideDialog()
+                                }
+
+                        }
+                        .onFailure {
+                            Config.hideDialog()
+                            Toast.makeText(
+                                this@EditProfileActivity,
+                                "something went wrong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+                }
+                imageUrl3 = imageUrl
                 binding.delete2.visibility = View.GONE
                 binding.delete3.visibility = View.VISIBLE
             }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -19,8 +20,13 @@ import com.rohan.datingapp.activity.MessageActivity
 import com.rohan.datingapp.databinding.UserItemLayoutBinding
 import com.rohan.datingapp.model.MessageModel
 import com.rohan.datingapp.model.UserModel
+import com.rohan.datingapp.repository.MessageRepository
+import com.rohan.datingapp.repository.UserRepository
+import com.rohan.datingapp.viewModel.UserViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import java.util.Objects
+import kotlin.getValue
 
 class MessageUserAdapter(val context: Context, private var list: ArrayList<String>, private val yourName: String)
     :RecyclerView.Adapter<MessageUserAdapter.MessageUserViewHolder>(){
@@ -32,6 +38,7 @@ class MessageUserAdapter(val context: Context, private var list: ArrayList<Strin
         return MessageUserViewHolder(UserItemLayoutBinding.inflate(LayoutInflater.from(context) , parent , false))
     }
 
+    @SuppressLint("SetTextI18n")
     @OptIn(DelicateCoroutinesApi::class)
     override fun onBindViewHolder(holder: MessageUserViewHolder, position: Int) {
         holder.setIsRecyclable(false)
@@ -41,118 +48,194 @@ class MessageUserAdapter(val context: Context, private var list: ArrayList<Strin
         var fcmToken = ""
 
         GlobalScope.launch {
-            val userDao = UserDao()
-            //val data: UserModel? = userDao.getUserById(list[position]).await().getValue(UserModel::class.java)
-            val snapshot: DataSnapshot = userDao.getUserById(list[position]).await()
+            val userRepository = UserRepository()
+            var user = UserModel()
+            userRepository.getUserById(list[position]).onSuccess {
+                    user = it
+            }.onFailure {
+                Toast.makeText(context , "something went wrong" , Toast.LENGTH_SHORT).show()
+            }
 
             withContext(Dispatchers.Main){
-                if(snapshot.exists()){
-                    val data = snapshot.getValue(UserModel::class.java)
-                    Glide.with(context).load(data?.image).into(holder.binding.userImage)
-                    holder.binding.userName.text = data?.name.toString().trim()
-                    name = data?.name!!
-                    image = data.image!!
-                    fcmToken = data.fcmToken.toString()
+                if(Objects.nonNull(user)){
+                    Glide.with(context).load(user.image).into(holder.binding.userImage)
+                    holder.binding.userName.text = user.name.toString().trim()
+                    name = user.name.toString()
+                    image = user.image.toString()
+                    fcmToken = user.fcmToken.toString()
 
                     val senderId = FirebaseAuth.getInstance().currentUser!!.uid
-                    val chatId: String = senderId + data.uid
-                    val reverseChatId: String = data.uid + senderId
+                    val chatId: String = senderId + user.uid
+                    val reverseChatId: String = user.uid + senderId
 
-                    val reference = FirebaseDatabase.getInstance().getReference("chats")
+                    val messageRepository = MessageRepository()
+                    var finalChatId = ""
+                    messageRepository.isChatIdValid(chatId)
+                        .onSuccess {
+                            if(it){
+                                finalChatId = chatId
+                            }else {
+                                messageRepository.isChatIdValid(reverseChatId).onSuccess {
+                                    finalChatId = reverseChatId
+                                }.onFailure {
+                                    Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        }
+                        .onFailure {
+                             Toast.makeText(context , "something went wrong" , Toast.LENGTH_SHORT).show()
+                        }
 
-                    reference.addValueEventListener(object: ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
+                    messageRepository.getChatRoomById(finalChatId)
+                        .onSuccess {
+                            var count = 0
+                            it.reversed()
 
-                            if(snapshot.hasChild(chatId)){
-                                FirebaseDatabase.getInstance().getReference("chats")
-                                    .child(chatId).addValueEventListener(object: ValueEventListener{
-                                        @SuppressLint("SetTextI18n")
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-
-                                            var count = 0
-
-                                            for(currData in snapshot.children.reversed()){
-                                                val currMsg = currData.getValue(MessageModel::class.java)
-                                                if(currMsg?.isSeen?.isNotEmpty() == true){
-                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
-                                                        count++
-                                                    }else{
-                                                        break
-                                                    }
-                                                }else{
-                                                    break
-                                                }
-                                            }
-
-                                            if(count > 0){
-                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
-                                                holder.binding.countMsg.text = "$count"
-                                            }
-
-                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
-                                            if(lastMsg?.message?.isNotEmpty() == true){
-                                                holder.binding.lastMessage.text = lastMsg.message
-                                            }else{
-                                                holder.binding.lastMessage.text = "Photo"
-                                            }
-
-                                        }
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                    })
-                            }else if(snapshot.hasChild(reverseChatId)){
-                                FirebaseDatabase.getInstance().getReference("chats")
-                                    .child(reverseChatId).addValueEventListener(object: ValueEventListener{
-                                        @SuppressLint("SetTextI18n")
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-
-                                            var count = 0
-
-                                            for(currData in snapshot.children.reversed()){
-                                                val currMsg = currData.getValue(MessageModel::class.java)
-                                                if(currMsg?.isSeen?.isNotEmpty() == true){
-                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
-                                                        count++
-                                                    }else{
-                                                        break
-                                                    }
-                                                }else{
-                                                    break
-                                                }
-                                            }
-
-                                            if(count > 0){
-                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
-                                                holder.binding.countMsg.text = "$count"
-                                            }
-
-                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
-                                            if(lastMsg?.message?.isNotEmpty() == true){
-                                                holder.binding.lastMessage.text = lastMsg.message
-                                            }else{
-                                                holder.binding.lastMessage.text = "Photo"
-                                            }
-
-                                        }
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                    })
+                            for(currMsg in it){
+                                if(currMsg.isSeen?.isNotEmpty() == true){
+                                    if(currMsg.isSeen == "false" && currMsg.senderId == user.uid){
+                                        count++
+                                    }else{
+                                        break
+                                    }
+                                }else{
+                                    break
+                                }
                             }
 
+                            if(count > 0){
+                                holder.binding.newMsgLayout.visibility = View.VISIBLE
+                                holder.binding.countMsg.text = "$count"
+                            }
+
+                            val lastMsg = it.last()
+                            if(lastMsg.message?.isNotEmpty() == true){
+                                holder.binding.lastMessage.text = lastMsg.message
+                            }else{
+                                holder.binding.lastMessage.text = "Photo"
+                            }
+                        }
+                        .onFailure {
+                            Toast.makeText(context , "something went wrong" , Toast.LENGTH_SHORT).show()
                         }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-
-                        }
-                    })
                 }
-
             }
+
+
+//            val userDao = UserDao()
+//            //val data: UserModel? = userDao.getUserById(list[position]).await().getValue(UserModel::class.java)
+//            val snapshot: DataSnapshot = userDao.getUserById(list[position]).await()
+//
+//            withContext(Dispatchers.Main){
+//                if(snapshot.exists()){
+//                    val data = snapshot.getValue(UserModel::class.java)
+//                    Glide.with(context).load(data?.image).into(holder.binding.userImage)
+//                    holder.binding.userName.text = data?.name.toString().trim()
+//                    name = data?.name!!
+//                    image = data.image!!
+//                    fcmToken = data.fcmToken.toString()
+//
+//                    val senderId = FirebaseAuth.getInstance().currentUser!!.uid
+//                    val chatId: String = senderId + data.uid
+//                    val reverseChatId: String = data.uid + senderId
+//
+//                    val reference = FirebaseDatabase.getInstance().getReference("chats")
+//
+//                    reference.addValueEventListener(object: ValueEventListener {
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                            if(snapshot.hasChild(chatId)){
+//                                FirebaseDatabase.getInstance().getReference("chats")
+//                                    .child(chatId).addValueEventListener(object: ValueEventListener{
+//                                        @SuppressLint("SetTextI18n")
+//                                        override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                                            var count = 0
+//
+//                                            for(currData in snapshot.children.reversed()){
+//                                                val currMsg = currData.getValue(MessageModel::class.java)
+//                                                if(currMsg?.isSeen?.isNotEmpty() == true){
+//                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
+//                                                        count++
+//                                                    }else{
+//                                                        break
+//                                                    }
+//                                                }else{
+//                                                    break
+//                                                }
+//                                            }
+//
+//                                            if(count > 0){
+//                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
+//                                                holder.binding.countMsg.text = "$count"
+//                                            }
+//
+//                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
+//                                            if(lastMsg?.message?.isNotEmpty() == true){
+//                                                holder.binding.lastMessage.text = lastMsg.message
+//                                            }else{
+//                                                holder.binding.lastMessage.text = "Photo"
+//                                            }
+//
+//                                        }
+//                                        override fun onCancelled(error: DatabaseError) {
+//                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
+//                                        }
+//
+//                                    })
+//                            }else if(snapshot.hasChild(reverseChatId)){
+//                                FirebaseDatabase.getInstance().getReference("chats")
+//                                    .child(reverseChatId).addValueEventListener(object: ValueEventListener{
+//                                        @SuppressLint("SetTextI18n")
+//                                        override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                                            var count = 0
+//
+//                                            for(currData in snapshot.children.reversed()){
+//                                                val currMsg = currData.getValue(MessageModel::class.java)
+//                                                if(currMsg?.isSeen?.isNotEmpty() == true){
+//                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
+//                                                        count++
+//                                                    }else{
+//                                                        break
+//                                                    }
+//                                                }else{
+//                                                    break
+//                                                }
+//                                            }
+//
+//                                            if(count > 0){
+//                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
+//                                                holder.binding.countMsg.text = "$count"
+//                                            }
+//
+//                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
+//                                            if(lastMsg?.message?.isNotEmpty() == true){
+//                                                holder.binding.lastMessage.text = lastMsg.message
+//                                            }else{
+//                                                holder.binding.lastMessage.text = "Photo"
+//                                            }
+//
+//                                        }
+//                                        override fun onCancelled(error: DatabaseError) {
+//                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
+//                                        }
+//
+//                                    })
+//                            }
+//
+//                        }
+//
+//                        override fun onCancelled(error: DatabaseError) {
+//                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
+//
+//                        }
+//                    })
+//                }
+//
+//            }
         }
 
         holder.itemView.setOnClickListener {
