@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +27,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LikeAdapter(val context: Context) : RecyclerView.Adapter<LikeAdapter.LikeViewHolder>()  {
+class LikeAdapter(val context: Context, private val isPremium: Boolean) : RecyclerView.Adapter<LikeAdapter.LikeViewHolder>()  {
 
     private val list = ArrayList<UserModel>()
 
@@ -41,15 +42,33 @@ class LikeAdapter(val context: Context) : RecyclerView.Adapter<LikeAdapter.LikeV
     override fun onBindViewHolder(holder: LikeViewHolder, position: Int) {
         val currentItem = list[position]
 
-        Glide.with(context).load(currentItem.image).into(holder.binding.userImage)
-        holder.binding.userName.text = "${currentItem.name.toString().trim()}, ${currentItem.age.toString().trim()}"
+        if (isPremium) {
+            holder.binding.userImage.visibility = View.VISIBLE
+            holder.binding.premiumTextBlock.visibility = View.VISIBLE
+            holder.binding.lockedImage.visibility = View.GONE
+            holder.binding.lockedTextBlock.visibility = View.GONE
+            holder.binding.yes.visibility = View.VISIBLE
+            holder.binding.no.visibility = View.VISIBLE
 
-        holder.binding.userImage.setOnClickListener {
-            val intent = Intent(context , ShowUserActivity::class.java)
-            intent.putExtra("uid" , currentItem.uid)
-            intent.putExtra("check" , 0)
-            context.startActivity(intent)
+            Glide.with(context).load(currentItem.image).into(holder.binding.userImage)
+            holder.binding.userName.text = "${currentItem.name.toString().trim()}, ${currentItem.age.toString().trim()}"
+
+            holder.binding.userImage.setOnClickListener {
+                val intent = Intent(context, ShowUserActivity::class.java)
+                intent.putExtra("uid", currentItem.uid)
+                intent.putExtra("check", 0)
+                context.startActivity(intent)
+            }
+        } else {
+            holder.binding.userImage.visibility = View.GONE
+            holder.binding.premiumTextBlock.visibility = View.GONE
+            holder.binding.lockedImage.visibility = View.VISIBLE
+            holder.binding.lockedTextBlock.visibility = View.VISIBLE
+            holder.binding.yes.visibility = View.GONE
+            holder.binding.no.visibility = View.GONE
         }
+
+        if (!isPremium) return
 
         holder.binding.no.setOnClickListener {
             Config.showDialog(context)

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.rohan.datingapp.MainActivity
+import com.rohan.datingapp.activity.BuyPremiumActivity
 import com.rohan.datingapp.adapter.FriendsAdapter
 import com.rohan.datingapp.daos.UserDao
 import com.rohan.datingapp.adapter.LikeAdapter
@@ -125,10 +126,19 @@ class LikeFragment : Fragment() {
                     binding.friendRecyclerView.adapter = friendAdapter
                     friendAdapter.updateList(friendAdapterList)
 
-                    val adapter = LikeAdapter(mContext)
+                    val isPremium = mContext.getSharedPreferences("PREFS", 0)
+                        .getInt("premium", 0) == 1
+                    val adapter = LikeAdapter(mContext, isPremium)
                     binding.recyclerView.layoutManager = LinearLayoutManager(mContext)
                     binding.recyclerView.adapter = adapter
                     adapter.updateList(adapterList)
+
+                    if (!isPremium) {
+                        binding.upgradeBtnContainer.visibility = View.VISIBLE
+                        binding.upgradeBtn.setOnClickListener {
+                            startActivity(Intent(mContext, BuyPremiumActivity::class.java))
+                        }
+                    }
                     Config.hideDialog()
                 }else{
                     Toast.makeText(mContext, "Something went wrong", Toast.LENGTH_SHORT).show()

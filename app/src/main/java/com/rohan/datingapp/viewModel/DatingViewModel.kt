@@ -32,6 +32,9 @@ class DatingViewModel : ViewModel() {
     private val _error = MutableSharedFlow<String>()
     val error = _error.asSharedFlow()
 
+    private val _matchEvent = MutableSharedFlow<String>()
+    val matchEvent = _matchEvent.asSharedFlow()
+
     var currentUserName: String? = null
     var lastUserUid: String = ""
 
@@ -59,6 +62,7 @@ class DatingViewModel : ViewModel() {
                 rewindCheck = false
 
                 val blockedByMain = currUser.blockedUsers?.toHashSet() ?: hashSetOf()
+                val rightSwipedMeUids = currUser.rightSwipeBy?.toHashSet() ?: hashSetOf()
                 val result = arrayListOf<UserModel>()
                 var batchLastKey = lastFetchedKey
 
@@ -74,7 +78,8 @@ class DatingViewModel : ViewModel() {
                         if (uid == currentUid) continue
                         if (interact.contains(uid)) continue
                         if (blockedByMain.contains(uid)) continue
-                        if (model.interact?.contains(currentUid) == true) continue
+                        // Only hide users who interacted with current user if they haven't swiped right on us
+                        if (!rightSwipedMeUids.contains(uid) && model.interact?.contains(currentUid) == true) continue
                         if (model.blockedUsers?.contains(currentUid) == true) continue
 
                         val genderMatch = when (genderCheck) {
@@ -108,8 +113,23 @@ class DatingViewModel : ViewModel() {
         userDao.updateInteract(currentUid, 0, uid)
 
         if (direction == "Right") {
-            userDao.updateSwipeRightBy(uid, 0, currentUid)
-            sendLikeNotification(fcmToken)
+            viewModelScope.launch {
+                val otherUser = userDao.getUserById(uid).await().getValue(UserModel::class.java)
+                val alreadySwiped = otherUser?.rightSwipeBy?.contains(currentUid) == true
+
+                if (alreadySwiped) {
+                    // Mutual swipe → auto match
+                    userDao.updateSwipeRightByAndMatches(currentUid, uid)
+                    userDao.updateMatches(uid, 0, currentUid)
+                    val currUser = userDao.getUserById(currentUid).await().getValue(UserModel::class.java)
+                    sendMatchNotification(fcmToken, currUser?.name ?: "")           // notify the other user
+                    sendMatchNotification(currUser?.fcmToken, otherUser?.name ?: "") // notify current user
+                    _matchEvent.emit(otherUser?.name ?: "")
+                } else {
+                    userDao.updateSwipeRightBy(uid, 0, currentUid)
+                    sendLikeNotification(fcmToken)
+                }
+            }
         }
     }
 
@@ -123,6 +143,18 @@ class DatingViewModel : ViewModel() {
     private fun sendLikeNotification(fcmToken: String?) {
         val notification = PushNotificationModel(
             NotificationModel("$currentUserName sent you a friend request!", ""),
+            fcmToken
+        )
+        ApiUtilities.getInstance().sendNotification(notification)
+            .enqueue(object : Callback<PushNotificationModel> {
+                override fun onResponse(call: Call<PushNotificationModel>, response: Response<PushNotificationModel>) {}
+                override fun onFailure(call: Call<PushNotificationModel>, t: Throwable) {}
+            })
+    }
+
+    private fun sendMatchNotification(fcmToken: String?, friendName: String) {
+        val notification = PushNotificationModel(
+            NotificationModel("You have become friends with $friendName 🎉", ""),
             fcmToken
         )
         ApiUtilities.getInstance().sendNotification(notification)

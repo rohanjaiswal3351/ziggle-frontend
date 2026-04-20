@@ -7,8 +7,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.*
-import android.view.animation.AccelerateInterpolator
+import android.view.*import android.view.animation.AccelerateInterpolator
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -92,6 +91,15 @@ class DatingFragment : Fragment(), DatingAdapterInterface {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.error.collect { msg ->
                 Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.matchEvent.collect { name ->
+                binding.matchSubtitle.text = "You and $name are now friends!"
+                binding.matchOverlay.visibility = View.VISIBLE
+                binding.matchDismiss.setOnClickListener {
+                    binding.matchOverlay.visibility = View.GONE
+                }
             }
         }
     }
