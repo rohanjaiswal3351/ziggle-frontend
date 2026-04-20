@@ -27,7 +27,8 @@ object Config {
     }
 
     fun hideDialog(){
-        dialog!!.dismiss()
+        dialog?.dismiss()
+        dialog = null
     }
 
 }

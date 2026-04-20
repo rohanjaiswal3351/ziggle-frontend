@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "82209493480",
+    "firebase_url": "https://dating-app-b84a6-default-rtdb.firebaseio.com",
     "project_id": "dating-app-b84a6",
     "storage_bucket": "dating-app-b84a6.appspot.com"
   },
@@ -13,6 +14,38 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "82209493480-b8is0v5ihv8e9r7c1t1hovqbpq9de0r3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rohan.datingapp",
+            "certificate_hash": "46e4d49cd7c6cdabd09f6b927b0dbb0fb89d75f7"
+          }
+        },
+        {
+          "client_id": "82209493480-mp4dgmtv0lq9o49eqdgmv1l4o5lhnr8p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rohan.datingapp",
+            "certificate_hash": "da8a309cd8456c5889aadb52878c4701e8915f4e"
+          }
+        },
+        {
+          "client_id": "82209493480-qbl643aej1vrs83ogia6crmq5h1r75mh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rohan.datingapp",
+            "certificate_hash": "ec075e6ea1684a6c09ac490a475b2bec70ab5f0f"
+          }
+        },
+        {
+          "client_id": "82209493480-tv8kual2upkh5s5sss7ael9merr5fspk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rohan.datingapp",
+            "certificate_hash": "28964878f13ded775d8ce123b1e3d96ff311758a"
+          }
+        },
         {
           "client_id": "82209493480-t2kdegamp1g4rir2eb6i4ed1q4vgbh1a.apps.googleusercontent.com",
           "client_type": 3
