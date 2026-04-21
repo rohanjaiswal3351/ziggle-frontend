@@ -36,6 +36,15 @@ class UserDao {
         return usersCollection.get()
     }
 
+    fun getUsersPaginated(lastKey: String?, limit: Int): Task<DataSnapshot> {
+        val query = if (lastKey == null) {
+            usersCollection.orderByKey().limitToFirst(limit)
+        } else {
+            usersCollection.orderByKey().startAfter(lastKey).limitToFirst(limit)
+        }
+        return query.get()
+    }
+
     fun updateName(context: Context, uid: String, name: String){
         GlobalScope.launch {
             val user = getUserById(uid).await().getValue(UserModel::class.java)
