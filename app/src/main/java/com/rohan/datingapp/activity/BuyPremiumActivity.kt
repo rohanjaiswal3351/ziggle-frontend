@@ -8,9 +8,6 @@ import android.widget.Toast
 import com.adapty.Adapty
 import com.adapty.models.AdaptyPaywallProduct
 import com.adapty.utils.AdaptyResult
-//import com.adapty.Adapty
-//import com.adapty.models.AdaptyPaywallProduct
-//import com.adapty.utils.AdaptyResult
 import com.rohan.datingapp.databinding.ActivityBuyPremiumBinding
 import com.rohan.datingapp.utils.Config
 
@@ -77,7 +74,7 @@ class BuyPremiumActivity : AppCompatActivity() {
 
     private fun loadAdapty() {
         Config.showDialog(this)
-        Adapty.activate(this, "public_live_f1pOqQnH.In6h67XuImRZwtMs3J2w")
+        Adapty.activate(this, com.adapty.models.AdaptyConfig.Builder("public_live_f1pOqQnH.In6h67XuImRZwtMs3J2w").build())
 
         Adapty.getPaywall("zigglepaywall", locale = "en") { result0 ->
             when (result0) {
