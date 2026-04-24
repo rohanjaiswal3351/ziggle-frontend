@@ -23,152 +23,132 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
 class MessageUserAdapter(val context: Context, private var list: ArrayList<String>, private val yourName: String)
-    :RecyclerView.Adapter<MessageUserAdapter.MessageUserViewHolder>(){
+    : RecyclerView.Adapter<MessageUserAdapter.MessageUserViewHolder>() {
 
-    inner class MessageUserViewHolder(val binding: UserItemLayoutBinding)
-        : RecyclerView.ViewHolder(binding.root)
+    // Cache user data so we don't re-fetch on every scroll
+    private val userCache = HashMap<String, UserModel>()
+
+    inner class MessageUserViewHolder(val binding: UserItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+        var rootListener: ValueEventListener? = null
+        var chatListener: ValueEventListener? = null
+        var chatRef: com.google.firebase.database.DatabaseReference? = null
+        var rootRef: com.google.firebase.database.DatabaseReference? = null
+
+        fun clearListeners() {
+            chatListener?.let { chatRef?.removeEventListener(it) }
+            rootListener?.let { rootRef?.removeEventListener(it) }
+            rootListener = null
+            chatListener = null
+            chatRef = null
+            rootRef = null
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageUserViewHolder {
-        return MessageUserViewHolder(UserItemLayoutBinding.inflate(LayoutInflater.from(context) , parent , false))
+        return MessageUserViewHolder(UserItemLayoutBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onBindViewHolder(holder: MessageUserViewHolder, position: Int) {
-        holder.setIsRecyclable(false)
+        // Remove old listeners before rebinding
+        holder.clearListeners()
 
-        var name = ""
-        var image = ""
-        var fcmToken = ""
+        val uid = list[position]
 
-        GlobalScope.launch {
-            val userDao = UserDao()
-            //val data: UserModel? = userDao.getUserById(list[position]).await().getValue(UserModel::class.java)
-            val snapshot: DataSnapshot = userDao.getUserById(list[position]).await()
+        fun bindUser(data: UserModel) {
+            Glide.with(context).load(data.image).into(holder.binding.userImage)
+            holder.binding.userName.text = data.name.toString().trim()
 
-            withContext(Dispatchers.Main){
-                if(snapshot.exists()){
-                    val data = snapshot.getValue(UserModel::class.java)
-                    Glide.with(context).load(data?.image).into(holder.binding.userImage)
-                    holder.binding.userName.text = data?.name.toString().trim()
-                    name = data?.name!!
-                    image = data.image!!
-                    fcmToken = data.fcmToken.toString()
+            val senderId = FirebaseAuth.getInstance().currentUser!!.uid
+            val chatId = senderId + data.uid
+            val reverseChatId = data.uid + senderId
+            val chatsRef = FirebaseDatabase.getInstance().getReference("chats")
 
-                    val senderId = FirebaseAuth.getInstance().currentUser!!.uid
-                    val chatId: String = senderId + data.uid
-                    val reverseChatId: String = data.uid + senderId
+            val rootListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val activeChatId = when {
+                        snapshot.hasChild(chatId) -> chatId
+                        snapshot.hasChild(reverseChatId) -> reverseChatId
+                        else -> return
+                    }
+                    val activeChatRef = chatsRef.child(activeChatId)
+                    holder.chatRef = activeChatRef
 
-                    val reference = FirebaseDatabase.getInstance().getReference("chats")
-
-                    reference.addValueEventListener(object: ValueEventListener {
+                    val chatListener = object : ValueEventListener {
+                        @SuppressLint("SetTextI18n")
                         override fun onDataChange(snapshot: DataSnapshot) {
+                            if (!snapshot.exists() || snapshot.childrenCount == 0L) return
 
-                            if(snapshot.hasChild(chatId)){
-                                FirebaseDatabase.getInstance().getReference("chats")
-                                    .child(chatId).addValueEventListener(object: ValueEventListener{
-                                        @SuppressLint("SetTextI18n")
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-
-                                            var count = 0
-
-                                            for(currData in snapshot.children.reversed()){
-                                                val currMsg = currData.getValue(MessageModel::class.java)
-                                                if(currMsg?.isSeen?.isNotEmpty() == true){
-                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
-                                                        count++
-                                                    }else{
-                                                        break
-                                                    }
-                                                }else{
-                                                    break
-                                                }
-                                            }
-
-                                            if(count > 0){
-                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
-                                                holder.binding.countMsg.text = "$count"
-                                            }
-
-                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
-                                            if(lastMsg?.message?.isNotEmpty() == true){
-                                                holder.binding.lastMessage.text = lastMsg.message
-                                            }else{
-                                                holder.binding.lastMessage.text = "Photo"
-                                            }
-
-                                        }
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                    })
-                            }else if(snapshot.hasChild(reverseChatId)){
-                                FirebaseDatabase.getInstance().getReference("chats")
-                                    .child(reverseChatId).addValueEventListener(object: ValueEventListener{
-                                        @SuppressLint("SetTextI18n")
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-
-                                            var count = 0
-
-                                            for(currData in snapshot.children.reversed()){
-                                                val currMsg = currData.getValue(MessageModel::class.java)
-                                                if(currMsg?.isSeen?.isNotEmpty() == true){
-                                                    if(currMsg.isSeen == "false" && currMsg.senderId == data.uid){
-                                                        count++
-                                                    }else{
-                                                        break
-                                                    }
-                                                }else{
-                                                    break
-                                                }
-                                            }
-
-                                            if(count > 0){
-                                                holder.binding.newMsgLayout.visibility = View.VISIBLE
-                                                holder.binding.countMsg.text = "$count"
-                                            }
-
-                                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
-                                            if(lastMsg?.message?.isNotEmpty() == true){
-                                                holder.binding.lastMessage.text = lastMsg.message
-                                            }else{
-                                                holder.binding.lastMessage.text = "Photo"
-                                            }
-
-                                        }
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-                                        }
-
-                                    })
+                            var count = 0
+                            for (currData in snapshot.children.reversed()) {
+                                val currMsg = currData.getValue(MessageModel::class.java)
+                                if (currMsg?.isSeen?.isNotEmpty() == true) {
+                                    if (currMsg.isSeen == "false" && currMsg.senderId == data.uid) count++
+                                    else break
+                                } else break
                             }
 
+                            if (count > 0) {
+                                holder.binding.newMsgLayout.visibility = View.VISIBLE
+                                holder.binding.countMsg.text = "$count"
+                            } else {
+                                holder.binding.newMsgLayout.visibility = View.GONE
+                            }
+
+                            val lastMsg = snapshot.children.last().getValue(MessageModel::class.java)
+                            holder.binding.lastMessage.text =
+                                if (lastMsg?.message?.isNotEmpty() == true) lastMsg.message else "Photo"
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(context , "something went wrong", Toast.LENGTH_SHORT).show()
-
+                            Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                         }
-                    })
+                    }
+                    holder.chatListener = chatListener
+                    activeChatRef.addValueEventListener(chatListener)
                 }
 
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            holder.rootRef = chatsRef
+            holder.rootListener = rootListener
+            chatsRef.addValueEventListener(rootListener)
+
+            holder.itemView.setOnClickListener {
+                val intent = Intent(context, MessageActivity::class.java)
+                intent.putExtra("userid", uid)
+                intent.putExtra("name", data.name)
+                intent.putExtra("image", data.image)
+                intent.putExtra("fcm", data.fcmToken)
+                intent.putExtra("yourName", yourName)
+                context.startActivity(intent)
             }
         }
 
-        holder.itemView.setOnClickListener {
-            val intent = Intent(context , MessageActivity::class.java)
-            intent.putExtra("userid" , list[position])
-            intent.putExtra("name" , name)
-            intent.putExtra("image" , image)
-            intent.putExtra("fcm" , fcmToken)
-            intent.putExtra("yourName" , yourName)
-            context.startActivity(intent)
+        val cached = userCache[uid]
+        if (cached != null) {
+            bindUser(cached)
+        } else {
+            GlobalScope.launch {
+                val snapshot: DataSnapshot = UserDao().getUserById(uid).await()
+                withContext(Dispatchers.Main) {
+                    if (snapshot.exists()) {
+                        val data = snapshot.getValue(UserModel::class.java) ?: return@withContext
+                        userCache[uid] = data
+                        bindUser(data)
+                    }
+                }
+            }
         }
-
     }
 
-    override fun getItemCount(): Int {
-        return list.size
+    override fun onViewRecycled(holder: MessageUserViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
     }
 
+    override fun getItemCount() = list.size
 }

@@ -10,8 +10,6 @@ import android.os.Looper
 import android.view.WindowManager
 import com.adapty.Adapty
 import com.adapty.utils.AdaptyResult
-//import com.adapty.Adapty
-//import com.adapty.utils.AdaptyResult
 //import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth

@@ -29,13 +29,9 @@ class MessageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         binding = FragmentMessageBinding.inflate(layoutInflater)
 
         list = ArrayList()
-
-
-        //adapter = MessageUserAdapter(mContext, list, "Name")
 
         getUser()
 

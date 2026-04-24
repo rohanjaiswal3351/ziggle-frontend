@@ -44,14 +44,21 @@ class LikeFragment : Fragment() {
             activity?.finish()
         }
 
-        loadData()
-
         return binding.root
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::binding.isInitialized) {
+            list = ArrayList()
+            friendList = ArrayList()
+            loadData()
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
