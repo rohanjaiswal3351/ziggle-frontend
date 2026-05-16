@@ -4,81 +4,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/layout_bg"
     tools:context=".ui.DatingFragment">
 
+    <!-- Top bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/info"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_baseline_info_24"
+            app:tint="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/rewind"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/baseline_replay_24"
+            app:tint="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/info"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
             android:text="Ziggle"
-            android:textColor="@color/yellow_bg"
-            android:textSize="24sp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="26sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ImageView
-            android:id="@+id/filterBtn"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/filter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/premiumBtn"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_marginEnd="20dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/premium"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/filterBtn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/info"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/filterBtn"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/filter"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/ic_baseline_info_24" />
-
-        <ImageView
-            android:id="@+id/rewind"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            app:layout_constraintStart_toEndOf="@id/info"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/baseline_replay_24" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Card stack -->
     <com.yuyakaido.android.cardstackview.CardStackView
         android:id="@+id/cardStackView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout"
-        tools:listitem="@layout/item_user_layout"/>
+        tools:listitem="@layout/item_user_layout" />
 
     <!-- Match overlay -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,67 +96,57 @@
         android:layout_height="match_parent"
         android:background="#CC000000"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/matchTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif-condensed"
             android:text="🎉 You're Friends!"
             android:textColor="@color/white"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/matchSubtitle"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="12dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/matchSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:fontFamily="sans-serif-condensed"
             android:text="You and Name are now friends!"
             android:textColor="@color/yellow_bg"
             android:textSize="18sp"
-            android:fontFamily="sans-serif-condensed"
-            app:layout_constraintTop_toBottomOf="@id/matchTitle"
             app:layout_constraintBottom_toTopOf="@id/matchDismiss"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="32dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/matchTitle" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/matchDismiss"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:fontFamily="sans-serif-condensed"
+            android:paddingEnd="32dp"
+            android:paddingStart="32dp"
             android:text="Keep Swiping"
             android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:backgroundTint="@color/yellow_bg"
-            android:fontFamily="sans-serif-condensed"
+            android:textColor="@color/white"
             app:cornerRadius="24dp"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
-            app:layout_constraintTop_toBottomOf="@id/matchSubtitle"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/matchSubtitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/recyclerView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        tools:listitem="@layout/item_find_layout"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/layout"/>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

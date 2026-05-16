@@ -3,43 +3,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="50dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="64dp"
+    android:layout_marginVertical="3dp"
     android:gravity="start"
-    android:orientation="horizontal"
-    android:padding="3dp">
+    android:orientation="horizontal">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/sender_drawable">
+        android:background="@drawable/sender_drawable"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/messageText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginVertical="10dp"
             android:fontFamily="sans-serif-condensed"
+            android:maxWidth="240dp"
             android:text="Hello"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:visibility="gone" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/imageLayout"
-            android:layout_width="180dp"
-            android:layout_height="120dp"
+            android:layout_width="200dp"
+            android:layout_height="150dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp">
 
             <ImageView
                 android:id="@+id/imageView"
@@ -49,8 +44,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
 
 </LinearLayout>
