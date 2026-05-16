@@ -25,8 +25,22 @@ import kotlinx.coroutines.tasks.await
 class MessageUserAdapter(val context: Context, private var list: ArrayList<String>, private val yourName: String)
     : RecyclerView.Adapter<MessageUserAdapter.MessageUserViewHolder>() {
 
+    private val fullList = ArrayList<String>(list)
     // Cache user data so we don't re-fetch on every scroll
     private val userCache = HashMap<String, UserModel>()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun filter(query: String) {
+        list = if (query.isBlank()) {
+            ArrayList(fullList)
+        } else {
+            val q = query.trim().lowercase()
+            ArrayList(fullList.filter { uid ->
+                userCache[uid]?.name?.lowercase()?.contains(q) == true
+            })
+        }
+        notifyDataSetChanged()
+    }
 
     inner class MessageUserViewHolder(val binding: UserItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         var rootListener: ValueEventListener? = null

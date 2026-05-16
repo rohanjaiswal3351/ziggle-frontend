@@ -58,6 +58,18 @@ class DatingAdapter(val context: Context, val listener: DatingAdapterInterface)
     @SuppressLint("SetTextI18n", "UseCompatLoadingForDrawables")
     override fun onBindViewHolder(holder: DatingViewHolder, position: Int) {
         holder.setIsRecyclable(false)
+
+        // Make the photo fill the full card height so details are only visible on scroll
+        holder.itemView.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                holder.itemView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val cardHeight = holder.itemView.height
+                if (cardHeight > 0) {
+                    holder.binding.photoFrame.layoutParams.height = cardHeight
+                    holder.binding.photoFrame.requestLayout()
+                }
+            }
+        })
         val currentItem = list[position]
 
         holder.binding.name.text = "${currentItem.name.toString().trim()}, ${currentItem.age.toString().trim()}"
